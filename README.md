@@ -1,8 +1,8 @@
 <h1 align="Center">
-Linux e AWS
+AWS e Docker
 </h1>
 
-Atividade prática com AWS e Docker do estágio em DevSecOps da empresa [Compass UOL](http://compass.uol) para fixar os conhecimentos sobre essas tecnologias. 
+Atividade prática com AWS e Docker do estágio em DevSecOps da empresa [Compass UOL](http://compass.uol) para fixar os conhecimentos sobre essas tecnologias. Para execução serão utilizadas aplicações dos conceitos de Docker, Docker Compose e Load Balancer, para subir uma aplicação Wordpress com banco de dados MySQL.
 
 # Índice
 
