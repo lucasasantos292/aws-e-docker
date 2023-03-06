@@ -6,11 +6,12 @@ Atividade prática com AWS e Docker do estágio em DevSecOps da empresa [Compass
 
 # Índice
 * [Descrição](#descrição-da-atividade)
-* [Passos iniciais](#passos-iniciais)
 * [Criação Grupos de Segurança](#grupos-de-segurança)
 * [Criação da Instância](#criação-da-instância-ec2)
 * [Configuração do NFS](#configuração-do-nfs)
 * [Criação do Load Balancer](#criação-do-load-balancer)
+* [Docker Compose](#docker-compose)
+* [Criação dos Conteiners](#criação-dos-conteiners)
 
 
 
@@ -34,9 +35,7 @@ Wordpress
 AWS para a aplicação Wordpress
 
 
-
-
-# Passos iniciais
+# Desenvolvimento da Atividade
 
 ## Grupos de Segurança
 * Grupo de segurança da instância
@@ -76,9 +75,65 @@ Depois de criado, registre a sua instância para que ela possa ser verificada e 
 
 Agora, Crie um Application Load Balancer e coloque o Schema Internet-facing, para que possa ser acessado pela internet. Selecione a VPC utilizada até então, selecione o Security Group criado para ele e em _Listeners_ selecione o Target Group criado anteriormente.
 
+## Docker Compose
 
-7. depois só colocar o docker-compose para rodar na EC2, ver com o docker ps se ta up
-8. e por ultimo, entrar no target group para ver como ta o estado do target que foi colocado no passo 5
-9. se ele tiver Health, é só ir no Load Balancer e pegar o DNS que ele da, jogar no google e ele deve acessar a tela do wordpress
+No arquivo [_user_data.sh_](/scripts/user_data.sh) há os passos para instalação do Docker e Docker Compose, que são basicamente os comandos:
+```bash
+# Instalação e inicialização do Docker
+sudo yum install docker -y
+sudo service docker start
+sudo systemctl enable docker.service
+sudo usermod -aG docker ec2-user
+# Instalação do Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose 
+sudo chmod +x /usr/local/bin/docker-compose
+```
+Para testarmos o funcionamento do Docker Compose, podemos rodar o comando `docker-compose --version`.
 
+## Criação dos Conteiners
+
+Escolha um diretório e execute o comando
+```bash
+vim docker-compose.yml
+```
+ou utilize um outro editor de texto de sua preferência.
+
+Um arquivo _docker-compose_ contem as instruções para criação de conteiners de maneira conjunta, neste caso, temos a criação de um conteiner Wordpress e um banco de dados MySql.
+```yaml
+version: '3.1'
+
+services:
+
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
+    volumes:
+      - /wordpress:/var/www/html
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
+    volumes:
+      - /db:/var/lib/mysql
+
+volumes:
+  wordpress:
+  db:
+```
+Salve o arquivo _docker-compose.yml_ e execute o comando `docker-compose up -d`. Dessa forma irão subir os conteiners. 
+
+Na tela do [Load Balancer](#criação-do-load-balancer), acesse o link DNS, você verá a tela inicial do Wordpress.
+![](/images/wordpress.png)
 
