@@ -1,32 +1,33 @@
-version: '3.3'
+version: '3.1'
 
 services:
+
   wordpress:
-    image: wordpress:latest
+    image: wordpress
     restart: always
-    ports:
-      - 80:80
     depends_on:
-      - mysql
+      - db
+    ports:
+      - 8080:80
     environment:
-      WORDPRESS_DB_HOST: mysql
+      WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: ec2-user
-      WORDPRESS_DB_PASSWORD: docker00
-      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_PASSWORD: docker
+      WORDPRESS_DB_NAME: mysql
     volumes:
       - /efs/lucasalves/wordpress:/var/www/html
-  mysql:
-    image: mysql:latest
+
+  db:
+    image: mysql:5.7
     restart: always
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: docker00
-      MYSQL_PASSWORD: docker00
+      MYSQL_DATABASE: mysql
       MYSQL_USER: ec2-user
-      MYSQL_DATABASE: wordpress
-
+      MYSQL_PASSWORD: docker
+      MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
-      - /efs/lucasalves/mysql:/var/lib/mysql
+      - /efs/lucasalves/db:/var/lib/mysql
 
 volumes:
-    wordpress:
-    mysql:
+  wordpress:
+  db:
