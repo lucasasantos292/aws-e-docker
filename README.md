@@ -8,6 +8,8 @@ Atividade prática com AWS e Docker do estágio em DevSecOps da empresa [Compass
 * [Descrição](#descrição-da-atividade)
 * [Passos iniciais](#passos-iniciais)
 * [Criação Grupos de Segurança](#grupos-de-segurança)
+* [Criação da Instância](#criação-da-instância-ec2)
+* [Configuração do NFS](#configuração-do-nfs)
 * [Criação do Load Balancer](#criação-do-load-balancer)
 
 
@@ -50,15 +52,33 @@ Agora, deixe as portas HTTP do Security Group da instância liberadas apenas par
 
  ![](/images/sg-instancia.png)
 
+ ## Criação da Instância EC2
+
+Para criação da sua instância ec2, navegue até a [Console AWS](https://console.aws.amazon.com/) e faça seu login. Acesse a página ec2 e execute uma nova instância.
+Na área de dados avançados, cole o conteúdo do arquivo [_user_data.sh_](/scripts/user_data.sh) no campo _Dados do Usuário_. Este arquivo é um _script_ que será executado na inicialização da instância.
+
+## Configuração do NFS
+
+No _script user_data.sh_ há o comando para montar e tornar automático o NFS em caso de reinicialização da instância:
+
+```bash
+sudo mkdir /efs
+sudo echo "ID_FILESYSTEM:/ /PONTO_DE_MONTAGEM nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport,_netdev 0 0" >> /etc/fstab
+sudo mount -a
+```
+
 ## Criação do Load Balancer
-4. criei um Target group para instancias, coloquei a VPC padrao, e nas configurações avançadas do Health check coloquei no código de sucesso o 200,302
-5. Na parte de registrar targets eu coloquei a instancia que eu quero e só
-6. Criei um Application Load Balancer e coloquei o schema dele para ser Internet-facing. Selecionei a VPC padrão, e o SG dele é o que criei para ele no passo 1. Nos listeners coloquei o target group que criei no passo 4
+
+Para criação do Load Balancer, utilize a mesma VPC onde está o Security Group e crie um Target Group para anexar sua instância. Nas configurações avançadas do Target Group, em Health Check, coloque no código de sucesso o código de retorno HTTP 200.
+
+Depois de criado, registre a sua instância para que ela possa ser verificada e acessada pelo Load Balancer.
+
+
+Agora, Crie um Application Load Balancer e coloque o Schema Internet-facing, para que possa ser acessado pela internet. Selecione a VPC utilizada até então, selecione o Security Group criado para ele e em _Listeners_ selecione o Target Group criado anteriormente.
+
+
 7. depois só colocar o docker-compose para rodar na EC2, ver com o docker ps se ta up
 8. e por ultimo, entrar no target group para ver como ta o estado do target que foi colocado no passo 5
 9. se ele tiver Health, é só ir no Load Balancer e pegar o DNS que ele da, jogar no google e ele deve acessar a tela do wordpress
 
-## Criação da Instância EC2
-
-Para criação da sua instância ec2, navegue até a [Console AWS](https://console.aws.amazon.com/) e faça seu login. Acesse a página ec2 e execute uma nova instância.
 
