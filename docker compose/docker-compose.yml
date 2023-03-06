@@ -5,28 +5,26 @@ services:
   wordpress:
     image: wordpress
     restart: always
-    depends_on:
-      - db
     ports:
       - 8080:80
     environment:
       WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_USER: ec2-user
-      WORDPRESS_DB_PASSWORD: docker
-      WORDPRESS_DB_NAME: mysql
+      WORDPRESS_DB_USER: exampleuser
+      WORDPRESS_DB_PASSWORD: examplepass
+      WORDPRESS_DB_NAME: exampledb
     volumes:
-      - /efs/lucasalves/wordpress:/var/www/html
+      - /efs/wordpress:/var/www/html
 
   db:
     image: mysql:5.7
     restart: always
     environment:
-      MYSQL_DATABASE: mysql
-      MYSQL_USER: ec2-user
-      MYSQL_PASSWORD: docker
+      MYSQL_DATABASE: exampledb
+      MYSQL_USER: exampleuser
+      MYSQL_PASSWORD: examplepass
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
-      - /efs/lucasalves/db:/var/lib/mysql
+      - /efs/db:/var/lib/mysql
 
 volumes:
   wordpress:
